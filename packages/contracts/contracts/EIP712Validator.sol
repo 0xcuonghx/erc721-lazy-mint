@@ -11,22 +11,15 @@ abstract contract EIP712Validator is EIP712 {
      */
     using ECDSA for bytes32;
 
-    /**
-     * @dev Mapping to hold the state if token is minted. This is used to verify if a voucher
-     * has been used or not.
-     */
-    mapping(bytes32 => bool) private minted;
-
     /// @dev Mint data struct.
     struct Mint721Data {
-        bytes32 uuid;
         address to;
     }
 
     /// @dev Mint voucher typehash, pre-computed to save gas.
-    // keccak256("Mint721Data(bytes32 uuid,address to)");
+    // keccak256("Mint721Data(address to)");
     bytes32 private constant TYPEHASH =
-        0x89f1a7cb490bc161bcfcb52eb0eaaa4fdcc04e51c441d7765daca84d2e95d1ec;
+        0x55574eadd46406a3e156b58b6a5a0d98e94658fdb496115656d9c8df6259b39b;
 
     // solhint-disable-next-line no-empty-blocks
     constructor() EIP712("EIP712Validator", "1") {}
@@ -45,7 +38,6 @@ abstract contract EIP712Validator is EIP712 {
                 keccak256(
                     abi.encode(
                         TYPEHASH,
-                        data.uuid,
                         data.to
                     )
                 )
@@ -63,7 +55,7 @@ abstract contract EIP712Validator is EIP712 {
         returns (bool success, address signer)
     {
         signer = _hash(data).recover(signature);
-        success = !minted[data.uuid] && _isValidSigner(signer);
+        success = _isValidSigner(signer);
     }
 
     /**
@@ -73,16 +65,13 @@ abstract contract EIP712Validator is EIP712 {
     function _verify(
         Mint721Data calldata data,
         bytes calldata signature
-    ) internal returns (address) {
+    ) internal view returns (address) {
         bool success;
         address signer;
 
         // Ensure not minted
         (success, signer) = verify(data, signature);
         require(success, "Invalid voucher");
-
-        // Set minted, if valid and invalidate the voucher.
-        minted[data.uuid] = true;
 
         return signer;
     }

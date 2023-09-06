@@ -50,4 +50,7 @@ contract ERC721LazyMint is ERC721, ReentrancyGuard, Ownable, EIP712Validator {
         return msg.sender == signer;
     }
 
+    function totalSupply() public view returns (uint256) {
+        return _tokenIdCounter.current() ;
+    }
 }

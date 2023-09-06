@@ -1,0 +1,15 @@
+runtime: nodejs16
+env: standard
+service: admin-web-app
+entrypoint: npm run start
+
+handlers:
+  - url: /.*
+    secure: always
+    redirect_http_response_code: 301
+    script: auto
+
+env_variables:
+
+build_env_variables:
+  GOOGLE_NODE_RUN_SCRIPTS: ''

@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "hardhat test",
-    "deploy": "npx hardhat run scripts/deploy.ts --network sandbox",
-    "verify": ""
+    "deploy": "hardhat run scripts/deploy.ts --network sandbox",
+    "compile": "hardhat compile"
   },
   "keywords": [],
   "author": "cuonghx-gutech",

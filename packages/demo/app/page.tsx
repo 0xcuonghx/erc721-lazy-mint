@@ -6,7 +6,7 @@ import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
-import { Address, useContractRead, useContractWrite } from 'wagmi';
+import { Address, useAccount, useContractRead, useContractWrite, useSignTypedData } from 'wagmi';
 import { ERC721LazyMintABI } from './lib/constants/abis/abis';
 import { Typography } from '@mui/material';
 
@@ -35,6 +35,39 @@ export default function Page() {
     functionName: 'safeMint'
   })
 
+  const { address } = useAccount()
+
+  const domain = {
+    name: 'EIP712Validator',
+    version: '1',
+    chainId: 99999,
+    verifyingContract: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address,
+  } as const    
+
+  const types = {
+    Mint721Data: [
+      { name: 'to', type: 'address' },
+    ],
+  } as const
+
+  const message = {
+    to: address as Address,
+  } as const
+
+  const { data: signData, signTypedData } =
+    useSignTypedData({
+      domain,
+      message,
+      primaryType: 'Mint721Data',
+      types,
+    })
+  
+  const { write: lazyMint } = useContractWrite({
+    abi: ERC721LazyMintABI,
+    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address,
+    functionName: 'lazyMint'
+  })
+
   return (
     <Box>
       <Typography variant='h5'>
@@ -60,6 +93,17 @@ export default function Page() {
             <Typography variant="h6">
               Lazy mint nft
             </Typography>
+            <Typography variant='subtitle1'>
+              Sign structure
+            </Typography>
+            <Typography variant='body1'>
+              To: {address}
+            </Typography>
+            <Button variant='contained' onClick={() => signTypedData()}>Sign</Button>
+            <Typography variant='body1'>Signature: {signData}</Typography>
+            <Button variant='contained' onClick={() => {
+              lazyMint({ args: [message, signData] })
+            }}>Mint</Button>
           </Paper>
         </Grid>
       </Grid>

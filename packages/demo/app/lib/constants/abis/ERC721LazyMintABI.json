@@ -259,11 +259,6 @@
       {
         "components": [
           {
-            "internalType": "bytes32",
-            "name": "uuid",
-            "type": "bytes32"
-          },
-          {
             "internalType": "address",
             "name": "to",
             "type": "address"
@@ -516,11 +511,6 @@
     "inputs": [
       {
         "components": [
-          {
-            "internalType": "bytes32",
-            "name": "uuid",
-            "type": "bytes32"
-          },
           {
             "internalType": "address",
             "name": "to",
